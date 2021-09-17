@@ -9,7 +9,7 @@
         }],
 		"authorLink": "https://github.com/Ekibunnel",
         "version": "1.0.0",
-        "description": "Apply custom configuration when joining a new server",
+        "description": "Apply a custom configuration when joining a new server",
         "github": "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         "github_raw": "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
