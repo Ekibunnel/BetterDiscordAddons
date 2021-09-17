@@ -1,6 +1,8 @@
 /**
  * @name ServerConfig
  * @invite PEsMUjatGu
+ * @version 1.0.0
+ * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
  * @source https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js
  */
@@ -29,7 +31,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"main":"index.js","info":{"name":"ServerConfig","inviteCode":"PEsMUjatGu","authors":[{"name":"Ekibunnel","github_username":"Ekibunnel"}],"version":"0.0.1","description":"Default configuration for newly joigned servers","github":"https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig","github_raw":"https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"},"changelog":[{"title":"INDEV","type":"progress","items":["Plugin in development"]}],"defaultConfig":[{"type":"switch","id":"grandOverride","name":"Main Override","note":"This could be a global override or something idk","value":false},{"type":"category","id":"basic","name":"Basic Settings","collapsible":true,"shown":false,"settings":[{"type":"textbox","id":"textbox","name":"Basic Textbox","note":"Description of the textbox setting","value":"nothing","placeholder":""},{"type":"dropdown","id":"dropdown","name":"Select","note":"You have choices for now","value":"weiner","options":[{"label":"Test 1","value":"weiner"},{"label":"Test 2","value":50},{"label":"Test 3","value":"{label: \"Test 1\", value: \"weiner\"})"}]},{"type":"radio","id":"radio","name":"Smol Choices","note":"You have less choices now","value":50,"options":[{"name":"Test 1","value":"weiner","desc":"This is the first test","color":"#ff0000"},{"name":"Test 2","value":50,"desc":"This is the second test","color":"#00ff00"},{"name":"Test 3","value":"{label: \"Test 1\", value: \"weiner\"})","desc":"This is the third test","color":"#0000ff"}]},{"type":"switch","id":"switch1","name":"A Switch","note":"This could be a boolean","value":false},{"type":"switch","id":"switch2","name":"Anotha one","note":"This could be a boolean2","value":true},{"type":"switch","id":"switch3","name":"Anotha one two","note":"This could be a boolean3","value":true},{"type":"switch","id":"switch4","name":"Anotha one too","note":"This could be a boolean4","value":false}]},{"type":"category","id":"advanced","name":"Advanced Settings","collapsible":true,"shown":false,"settings":[{"type":"color","id":"color","name":"Example Color","note":"Color up your life","value":"#ff0000"},{"type":"keybind","id":"keys","name":"DJ Khaled","note":"I got them keys keys keys","value":[162,74]},{"type":"slider","id":"slider1","name":"Electric Slide","note":"Down down do your thang do your thang","value":30,"min":0,"max":100},{"type":"slider","id":"slider2","name":"Marker Slide","note":"Preset markers example","value":54,"min":0,"max":90,"markers":[0,9,18,27,36,45,54,63,72,81,90],"stickToMarkers":true},{"type":"file","id":"fileObj","name":"File To Upload","note":"This setting type needs a rewrite..."}]}]};
+    const config = {"main":"index.js","info":{"name":"ServerConfig","inviteCode":"PEsMUjatGu","authors":[{"name":"Ekibunnel","github_username":"Ekibunnel"}],"authorLink":"https://github.com/Ekibunnel","version":"1.0.0","description":"Apply custom configuration when joining a new server","github":"https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig","github_raw":"https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"},"changelog":[{"title":"1.0","type":"improved","items":["Release"]}],"defaultConfig":[{"type":"category","id":"notification","name":"Notification","collapsible":true,"shown":true,"settings":[{"type":"switch","id":"muted","name":"Mute server","note":"","value":false},{"type":"radio","id":"message_notifications","name":"Server Notification Settings","note":"","value":1,"options":[{"name":"All Messages","value":0,"desc":"","color":"#000000"},{"name":"Only mentions","value":1,"desc":"","color":"#000000"},{"name":"Nothing","value":2,"desc":"","color":"#000000"}]},{"type":"switch","id":"suppress_everyone","name":"Suppress @everyone and @here","note":"","value":false},{"type":"switch","id":"suppress_roles","name":"Suppress All Role @mentions","note":"","value":false},{"type":"switch","id":"mobile_push","name":"Mobile Push Notifications","note":"","value":true}]},{"type":"category","id":"nickname","name":"Nickname","collapsible":true,"shown":false,"settings":[{"type":"textbox","id":"nick","name":"","note":"May not work on all servers, since a lot of them won't give you the permission to change nickname instantly","value":"","placeholder":"Nickname"}]},{"type":"category","id":"experimental","name":"Experimental","collapsible":true,"shown":false,"settings":[{"type":"switch","id":"terms","name":"Accept server terms","note":"Everything under this category may broke at any time, if so it will probably never be fixed","value":false}]}]};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -54,34 +56,57 @@ module.exports = (() => {
     } : (([Plugin, Api]) => {
         const plugin = (Plugin, Library) => {
 
-    const {Logger, Patcher} = Library;
+    const {PluginUtilities} = Library;
+    let dirtyDispatch = BdApi.findModuleByProps("dirtyDispatch");
 
-    return class ExamplePlugin extends Plugin {
+    function ON_GUILD_CREATED(data){
 
-        onStart() {
-            Logger.log("Started");
-            Patcher.before(Logger, "log", (t, a) => {
-                a[0] = "Patched Message: " + a[0];
-            });
+        let settings = PluginUtilities.loadSettings(config.info.name);
+
+        if(Object.keys(settings.notification).length > 0){
+            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.notification);
         }
 
+
+        if(settings.nickname.nick){
+            BdApi.findModuleByProps("changeNickname").changeNickname(data.guild.id, null, "@me",  settings.nickname.nick);
+        }
+    }
+
+    function ON_GUILD_JOIGNED(data){
+        let settings = PluginUtilities.loadSettings(config.info.name);
+
+        if(settings.experimental.terms){
+            BdApi.findModuleByProps("submitVerificationForm").submitVerificationForm(data.guildId, "@me");
+        }
+    }
+
+    return class ServerConfig extends Plugin {
+
+        onStart() {
+            if(this.settings.has_seen_settings !== undefined) {
+                BdApi.showToast(`${config.info.name} plugins is running, you have to change the plugin settings to make it do something`,
+                    {
+                        type:"success",
+                        icon:true,
+                        timeout:13000
+                    }
+                );
+            }
+            dirtyDispatch.subscribe("GUILD_CREATE", ON_GUILD_CREATED);
+            dirtyDispatch.subscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
+        }
+        
         onStop() {
-            Logger.log("Stopped");
-            Patcher.unpatchAll();
+            dirtyDispatch.unsubscribe("GUILD_CREATE", ON_GUILD_CREATED);
+            dirtyDispatch.unsubscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
         }
 
         getSettingsPanel() {
+            BdApi.setData(config.info.name, 'has_seen_settings', true);
             const panel = this.buildSettingsPanel();
-            panel.append(this.buildSetting({
-                type: "switch",
-                id: "otherOverride",
-                name: "A second override?!",
-                note: "wtf is happening here",
-                value: true,
-                onChange: value => this.settings["otherOverride"] = value
-            }));
             return panel.getElement();
-        }
+		}
     };
 
 };
