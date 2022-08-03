@@ -8,13 +8,14 @@
             "github_username": "Ekibunnel"
         }],
 		"authorLink": "https://github.com/Ekibunnel",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "Apply a custom configuration when joining a new server",
         "github": "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         "github_raw": "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     "changelog": [
-       {"title": "1.0", "type": "improved", "items": ["Release"]}
+		{"title": "1.0.1", "type": "fixed", "items": ["Dispatch module not found on canary and ptb"]},
+		{"title": "1.0", "type": "improved", "items": ["Release"]}
     ],
     "defaultConfig": [
         {

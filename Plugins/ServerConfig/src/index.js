@@ -2,7 +2,8 @@
 module.exports = (Plugin, Library) => {
 
     const {PluginUtilities} = Library;
-    let dirtyDispatch = BdApi.findModuleByProps("dirtyDispatch");
+    let dirtyDispatch = BdApi.findModuleByProps("dirtyDispatch") ? BdApi.findModuleByProps("dirtyDispatch") : BdApi.findModuleByProps("maybeDispatch");
+    if (dirtyDispatch == undefined) console.error("[PLUGIN] ServerConfig : Dispatch Module not found")
 
     function ON_GUILD_CREATED(data){
 
