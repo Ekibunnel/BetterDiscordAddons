@@ -1,7 +1,7 @@
 /**
  * @name ServerConfig
  * @invite PEsMUjatGu
- * @version 1.0.1
+ * @version 1.0.2
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
  * @source https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js
@@ -31,7 +31,7 @@
 @else@*/
 
 module.exports = (() => {
-    const config = {"main":"index.js","info":{"name":"ServerConfig","inviteCode":"PEsMUjatGu","authors":[{"name":"Ekibunnel","github_username":"Ekibunnel"}],"authorLink":"https://github.com/Ekibunnel","version":"1.0.1","description":"Apply a custom configuration when joining a new server","github":"https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig","github_raw":"https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"},"changelog":[{"title":"1.0.1","type":"fixed","items":["Dispatch module not found on canary and ptb"]},{"title":"1.0","type":"improved","items":["Release"]}],"defaultConfig":[{"type":"category","id":"notification","name":"Notification","collapsible":true,"shown":true,"settings":[{"type":"switch","id":"muted","name":"Mute server","note":"","value":false},{"type":"radio","id":"message_notifications","name":"Server Notification Settings","note":"","value":1,"options":[{"name":"All Messages","value":0,"desc":"","color":"#000000"},{"name":"Only mentions","value":1,"desc":"","color":"#000000"},{"name":"Nothing","value":2,"desc":"","color":"#000000"}]},{"type":"switch","id":"suppress_everyone","name":"Suppress @everyone and @here","note":"","value":false},{"type":"switch","id":"suppress_roles","name":"Suppress All Role @mentions","note":"","value":false},{"type":"switch","id":"mobile_push","name":"Mobile Push Notifications","note":"","value":true}]},{"type":"category","id":"nickname","name":"Nickname","collapsible":true,"shown":false,"settings":[{"type":"textbox","id":"nick","name":"","note":"May not work on all servers, since a lot of them won't give you the permission to change nickname instantly","value":"","placeholder":"Nickname"}]},{"type":"category","id":"experimental","name":"Experimental","collapsible":true,"shown":false,"settings":[{"type":"switch","id":"terms","name":"Accept server terms","note":"Everything under this category may broke at any time, if so it will probably never be fixed","value":false}]}]};
+    const config = {"main":"index.js","info":{"name":"ServerConfig","inviteCode":"PEsMUjatGu","authors":[{"name":"Ekibunnel","github_username":"Ekibunnel"}],"authorLink":"https://github.com/Ekibunnel","version":"1.0.2","description":"Apply a custom configuration when joining a new server","github":"https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig","github_raw":"https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"},"changelog":[{"title":"1.0.2","type":"fixed","items":["Dispatch module not found again"]},{"title":"1.0.1","type":"fixed","items":["Dispatch module not found on canary and ptb"]},{"title":"1.0","type":"improved","items":["Release"]}],"defaultConfig":[{"type":"category","id":"notification","name":"Notification","collapsible":true,"shown":true,"settings":[{"type":"switch","id":"muted","name":"Mute server","note":"","value":false},{"type":"radio","id":"message_notifications","name":"Server Notification Settings","note":"","value":1,"options":[{"name":"All Messages","value":0,"desc":"","color":"#000000"},{"name":"Only mentions","value":1,"desc":"","color":"#000000"},{"name":"Nothing","value":2,"desc":"","color":"#000000"}]},{"type":"switch","id":"suppress_everyone","name":"Suppress @everyone and @here","note":"","value":false},{"type":"switch","id":"suppress_roles","name":"Suppress All Role @mentions","note":"","value":false},{"type":"switch","id":"mobile_push","name":"Mobile Push Notifications","note":"","value":true}]},{"type":"category","id":"nickname","name":"Nickname","collapsible":true,"shown":false,"settings":[{"type":"textbox","id":"nick","name":"","note":"May not work on all servers, since a lot of them won't give you the permission to change nickname instantly","value":"","placeholder":"Nickname"}]},{"type":"category","id":"experimental","name":"Experimental","collapsible":true,"shown":false,"settings":[{"type":"switch","id":"terms","name":"Accept server terms","note":"Everything under this category may broke at any time, if so it will probably never be fixed","value":false}]}]};
 
     return !global.ZeresPluginLibrary ? class {
         constructor() {this._config = config;}
@@ -57,8 +57,8 @@ module.exports = (() => {
         const plugin = (Plugin, Library) => {
 
     const {PluginUtilities} = Library;
-    let dirtyDispatch = BdApi.findModuleByProps("dirtyDispatch") ? BdApi.findModuleByProps("dirtyDispatch") : BdApi.findModuleByProps("maybeDispatch");
-    if (dirtyDispatch == undefined) console.error("[PLUGIN] ServerConfig : Dispatch Module not found")
+    let dirtyDispatch = BdApi.findModuleByProps("dispatch", "subscribe");
+    if (!dirtyDispatch) console.error("[PLUGIN] ServerConfig : Dispatch Module not found")
 
     function ON_GUILD_CREATED(data){
 
