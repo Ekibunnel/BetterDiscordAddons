@@ -8,12 +8,13 @@
             "github_username": "Ekibunnel"
         }],
 		"authorLink": "https://github.com/Ekibunnel",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "Apply a custom configuration when joining a new server",
         "github": "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         "github_raw": "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     "changelog": [
+        {"title": "1.0.3", "type": "improved", "items": ["Updated config to include Highlights and Mute new events"]},
         {"title": "1.0.2", "type": "fixed", "items": ["Dispatch module not found again"]},
 		{"title": "1.0.1", "type": "fixed", "items": ["Dispatch module not found on canary and ptb"]},
 		{"title": "1.0", "type": "improved", "items": ["Release"]}
@@ -46,6 +47,17 @@
                     ]
                 },
                 {
+                    "type": "dropdown",
+                    "id": "notify_highlights",
+                    "name": "Include Highlights",
+                    "note": "",
+                    "value": 2,
+                    "options": [
+                        {"label": "Off", "value": 1},
+                        {"label": "On", "value": 2}
+                    ]
+                },
+                {
                     "type": "switch",
                     "id": "suppress_everyone",
                     "name": "Suppress @everyone and @here",
@@ -65,6 +77,13 @@
                     "name": "Mobile Push Notifications",
                     "note": "",
                     "value": true
+                },
+                {
+                    "type": "switch",
+                    "id": "mute_scheduled_events",
+                    "name": "Mute New Events",
+                    "note": "",
+                    "value": false
                 }
             ]
         },
