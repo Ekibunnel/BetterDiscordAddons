@@ -9,8 +9,8 @@ module.exports = (Plugin, Library) => {
 
         let settings = PluginUtilities.loadSettings(config.info.name);
 
-        if(Object.keys(settings.notification).length > 0){
-            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.notification);
+        if(Object.keys(settings.config).length > 0){
+            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.config);
         }
 
 

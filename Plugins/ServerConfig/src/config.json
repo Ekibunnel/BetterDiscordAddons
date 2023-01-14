@@ -2,28 +2,29 @@
     "main": "index.js",
     "info": {
         "name": "ServerConfig",
-		"inviteCode":"PEsMUjatGu",
+		"invite":"PEsMUjatGu",
         "authors": [{
             "name": "Ekibunnel",
             "github_username": "Ekibunnel"
         }],
 		"authorLink": "https://github.com/Ekibunnel",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "Apply a custom configuration when joining a new server",
         "github": "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         "github_raw": "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     "changelog": [
+        {"title": "1.0.4", "type": "improved", "items": ["Updated config to include Hide Muted Channels and Show All Channels"]},
         {"title": "1.0.3", "type": "improved", "items": ["Updated config to include Highlights and Mute new events"]},
-        {"title": "1.0.2", "type": "fixed", "items": ["Dispatch module not found again"]},
-		{"title": "1.0.1", "type": "fixed", "items": ["Dispatch module not found on canary and ptb"]},
+        {"title": "1.0.2 - Fixed", "type": "fixed", "items": ["Dispatch module not found again"]},
+		{"title": "1.0.1 - Fixed", "type": "fixed", "items": ["Dispatch module not found on canary and ptb"]},
 		{"title": "1.0", "type": "improved", "items": ["Release"]}
     ],
     "defaultConfig": [
         {
             "type": "category",
-            "id": "notification",
-            "name": "Notification",
+            "id": "config",
+            "name": "Server Config",
             "collapsible": true,
             "shown": true,
             "settings": [
@@ -82,6 +83,24 @@
                     "type": "switch",
                     "id": "mute_scheduled_events",
                     "name": "Mute New Events",
+                    "note": "",
+                    "value": false
+                },
+                {
+                    "type": "dropdown",
+                    "id": "flags",
+                    "name": "Show All Channels",
+                    "note": "",
+                    "value": 16384,
+                    "options": [
+                        {"label": "Off", "value": 16384},
+                        {"label": "On", "value": 0}
+                    ]
+                },
+                {
+                    "type": "switch",
+                    "id": "hide_muted_channels",
+                    "name": "Hide Muted Channels",
                     "note": "",
                     "value": false
                 }
