@@ -1,10 +1,12 @@
 /**
  * @name ServerConfig
- * @invite PEsMUjatGu
- * @version 1.0.3
+ * @description Apply a custom configuration when joining a new server
+ * @version 1.0.4
+ * @author Ekibunnel
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
  * @source https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js
+ * @invite PEsMUjatGu
  */
 /*@cc_on
 @if (@_jscript)
@@ -29,32 +31,237 @@
     WScript.Quit();
 
 @else@*/
-
-module.exports = (() => {
-    const config = {"main":"index.js","info":{"name":"ServerConfig","inviteCode":"PEsMUjatGu","authors":[{"name":"Ekibunnel","github_username":"Ekibunnel"}],"authorLink":"https://github.com/Ekibunnel","version":"1.0.3","description":"Apply a custom configuration when joining a new server","github":"https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig","github_raw":"https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"},"changelog":[{"title":"1.0.3","type":"improved","items":["Updated config to include Highlights and Mute new events"]},{"title":"1.0.2","type":"fixed","items":["Dispatch module not found again"]},{"title":"1.0.1","type":"fixed","items":["Dispatch module not found on canary and ptb"]},{"title":"1.0","type":"improved","items":["Release"]}],"defaultConfig":[{"type":"category","id":"notification","name":"Notification","collapsible":true,"shown":true,"settings":[{"type":"switch","id":"muted","name":"Mute server","note":"","value":false},{"type":"radio","id":"message_notifications","name":"Server Notification Settings","note":"","value":1,"options":[{"name":"All Messages","value":0,"desc":"","color":"#000000"},{"name":"Only mentions","value":1,"desc":"","color":"#000000"},{"name":"Nothing","value":2,"desc":"","color":"#000000"}]},{"type":"dropdown","id":"notify_highlights","name":"Include Highlights","note":"","value":2,"options":[{"label":"Off","value":1},{"label":"On","value":2}]},{"type":"switch","id":"suppress_everyone","name":"Suppress @everyone and @here","note":"","value":false},{"type":"switch","id":"suppress_roles","name":"Suppress All Role @mentions","note":"","value":false},{"type":"switch","id":"mobile_push","name":"Mobile Push Notifications","note":"","value":true},{"type":"switch","id":"mute_scheduled_events","name":"Mute New Events","note":"","value":false}]},{"type":"category","id":"nickname","name":"Nickname","collapsible":true,"shown":false,"settings":[{"type":"textbox","id":"nick","name":"","note":"May not work on all servers, since a lot of them won't give you the permission to change nickname instantly","value":"","placeholder":"Nickname"}]},{"type":"category","id":"experimental","name":"Experimental","collapsible":true,"shown":false,"settings":[{"type":"switch","id":"terms","name":"Accept server terms","note":"Everything under this category may broke at any time, if so it will probably never be fixed","value":false}]}]};
-
-    return !global.ZeresPluginLibrary ? class {
-        constructor() {this._config = config;}
-        getName() {return config.info.name;}
-        getAuthor() {return config.info.authors.map(a => a.name).join(", ");}
-        getDescription() {return config.info.description;}
-        getVersion() {return config.info.version;}
-        load() {
-            BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`, {
-                confirmText: "Download Now",
-                cancelText: "Cancel",
-                onConfirm: () => {
-                    require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
-                        if (error) return require("electron").shell.openExternal("https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js");
-                        await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
+const config = {
+    main: "index.js",
+    info: {
+        name: "ServerConfig",
+        invite: "PEsMUjatGu",
+        authors: [
+            {
+                name: "Ekibunnel",
+                github_username: "Ekibunnel"
+            }
+        ],
+        authorLink: "https://github.com/Ekibunnel",
+        version: "1.0.4",
+        description: "Apply a custom configuration when joining a new server",
+        github: "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
+        github_raw: "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
+    },
+    changelog: [
+        {
+            title: "1.0.4",
+            type: "improved",
+            items: [
+                "Updated config to include Hide Muted Channels and Show All Channels"
+            ]
+        },
+        {
+            title: "1.0.3",
+            type: "improved",
+            items: [
+                "Updated config to include Highlights and Mute new events"
+            ]
+        },
+        {
+            title: "1.0.2 - Fixed",
+            type: "fixed",
+            items: [
+                "Dispatch module not found again"
+            ]
+        },
+        {
+            title: "1.0.1 - Fixed",
+            type: "fixed",
+            items: [
+                "Dispatch module not found on canary and ptb"
+            ]
+        },
+        {
+            title: "1.0",
+            type: "improved",
+            items: [
+                "Release"
+            ]
+        }
+    ],
+    defaultConfig: [
+        {
+            type: "category",
+            id: "config",
+            name: "Server Config",
+            collapsible: true,
+            shown: true,
+            settings: [
+                {
+                    type: "switch",
+                    id: "muted",
+                    name: "Mute server",
+                    note: "",
+                    value: false
+                },
+                {
+                    type: "radio",
+                    id: "message_notifications",
+                    name: "Server Notification Settings",
+                    note: "",
+                    value: 1,
+                    options: [
+                        {
+                            name: "All Messages",
+                            value: 0,
+                            desc: "",
+                            color: "#000000"
+                        },
+                        {
+                            name: "Only mentions",
+                            value: 1,
+                            desc: "",
+                            color: "#000000"
+                        },
+                        {
+                            name: "Nothing",
+                            value: 2,
+                            desc: "",
+                            color: "#000000"
+                        }
+                    ]
+                },
+                {
+                    type: "dropdown",
+                    id: "notify_highlights",
+                    name: "Include Highlights",
+                    note: "",
+                    value: 2,
+                    options: [
+                        {
+                            label: "Off",
+                            value: 1
+                        },
+                        {
+                            label: "On",
+                            value: 2
+                        }
+                    ]
+                },
+                {
+                    type: "switch",
+                    id: "suppress_everyone",
+                    name: "Suppress @everyone and @here",
+                    note: "",
+                    value: false
+                },
+                {
+                    type: "switch",
+                    id: "suppress_roles",
+                    name: "Suppress All Role @mentions",
+                    note: "",
+                    value: false
+                },
+                {
+                    type: "switch",
+                    id: "mobile_push",
+                    name: "Mobile Push Notifications",
+                    note: "",
+                    value: true
+                },
+                {
+                    type: "switch",
+                    id: "mute_scheduled_events",
+                    name: "Mute New Events",
+                    note: "",
+                    value: false
+                },
+                {
+                    type: "dropdown",
+                    id: "flags",
+                    name: "Show All Channels",
+                    note: "",
+                    value: 16384,
+                    options: [
+                        {
+                            label: "Off",
+                            value: 16384
+                        },
+                        {
+                            label: "On",
+                            value: 0
+                        }
+                    ]
+                },
+                {
+                    type: "switch",
+                    id: "hide_muted_channels",
+                    name: "Hide Muted Channels",
+                    note: "",
+                    value: false
+                }
+            ]
+        },
+        {
+            type: "category",
+            id: "nickname",
+            name: "Nickname",
+            collapsible: true,
+            shown: false,
+            settings: [
+                {
+                    type: "textbox",
+                    id: "nick",
+                    name: "",
+                    note: "May not work on all servers, since a lot of them won't give you the permission to change nickname instantly",
+                    value: "",
+                    placeholder: "Nickname"
+                }
+            ]
+        },
+        {
+            type: "category",
+            id: "experimental",
+            name: "Experimental",
+            collapsible: true,
+            shown: false,
+            settings: [
+                {
+                    type: "switch",
+                    id: "terms",
+                    name: "Accept server terms",
+                    note: "Everything under this category may broke at any time, if so it will probably never be fixed",
+                    value: false
+                }
+            ]
+        }
+    ]
+};
+class Dummy {
+    constructor() {this._config = config;}
+    start() {}
+    stop() {}
+}
+ 
+if (!global.ZeresPluginLibrary) {
+    BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.name ?? config.info.name} is missing. Please click Download Now to install it.`, {
+        confirmText: "Download Now",
+        cancelText: "Cancel",
+        onConfirm: () => {
+            require("request").get("https://betterdiscord.app/gh-redirect?id=9", async (err, resp, body) => {
+                if (err) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                if (resp.statusCode === 302) {
+                    require("request").get(resp.headers.location, async (error, response, content) => {
+                        if (error) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                        await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), content, r));
                     });
+                }
+                else {
+                    await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
                 }
             });
         }
-        start() {}
-        stop() {}
-    } : (([Plugin, Api]) => {
-        const plugin = (Plugin, Library) => {
+    });
+}
+ 
+module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
+     const plugin = (Plugin, Library) => {
 
     const {PluginUtilities} = Library;
     let dirtyDispatch = BdApi.findModuleByProps("dispatch", "subscribe");
@@ -64,8 +271,8 @@ module.exports = (() => {
 
         let settings = PluginUtilities.loadSettings(config.info.name);
 
-        if(Object.keys(settings.notification).length > 0){
-            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.notification);
+        if(Object.keys(settings.config).length > 0){
+            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.config);
         }
 
 
@@ -111,7 +318,6 @@ module.exports = (() => {
     };
 
 };
-        return plugin(Plugin, Api);
-    })(global.ZeresPluginLibrary.buildPlugin(config));
-})();
+     return plugin(Plugin, Api);
+})(global.ZeresPluginLibrary.buildPlugin(config));
 /*@end@*/
