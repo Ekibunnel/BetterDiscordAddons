@@ -8,12 +8,13 @@
             "github_username": "Ekibunnel"
         }],
 		"authorLink": "https://github.com/Ekibunnel",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "Apply a custom configuration when joining a new server",
         "github": "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         "github_raw": "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     "changelog": [
+        {"title": "1.0.5", "type": "fixed", "items": ["Fix a potential bug that would reapplied the config to an already joined server"]},
         {"title": "1.0.4", "type": "improved", "items": ["Updated config to include Hide Muted Channels and Show All Channels"]},
         {"title": "1.0.3", "type": "improved", "items": ["Updated config to include Highlights and Mute new events"]},
         {"title": "1.0.2 - Fixed", "type": "fixed", "items": ["Dispatch module not found again"]},
