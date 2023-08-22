@@ -1,7 +1,7 @@
 /**
  * @name ServerConfig
  * @description Apply a custom configuration when joining a new server
- * @version 1.0.4
+ * @version 1.0.5
  * @author Ekibunnel
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
@@ -43,12 +43,19 @@ const config = {
             }
         ],
         authorLink: "https://github.com/Ekibunnel",
-        version: "1.0.4",
+        version: "1.0.5",
         description: "Apply a custom configuration when joining a new server",
         github: "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         github_raw: "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     changelog: [
+        {
+            title: "1.0.5",
+            type: "fixed",
+            items: [
+                "Fix a potential bug that would reapplied the config to an already joined server"
+            ]
+        },
         {
             title: "1.0.4",
             type: "improved",
@@ -267,17 +274,21 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     let dirtyDispatch = BdApi.findModuleByProps("dispatch", "subscribe");
     if (!dirtyDispatch) console.error("[PLUGIN] ServerConfig : Dispatch Module not found")
 
+    let ApplyConfigTimeWindow = 60000;
+
     function ON_GUILD_CREATED(data){
+        if(new Date(data.guild.joined_at).getTime() + ApplyConfigTimeWindow < new Date().getTime()){
+            console.warn("[PLUGIN] ServerConfig : server "+data.guild.id+" was joinned at " + JSON.stringify(data.joined_at) + " which is more than "+ApplyConfigTimeWindow+" ms ago, ignoring");
+        } else {
+            let settings = PluginUtilities.loadSettings(config.info.name);
 
-        let settings = PluginUtilities.loadSettings(config.info.name);
+            if(Object.keys(settings.config).length > 0){
+                BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.config);
+            }
 
-        if(Object.keys(settings.config).length > 0){
-            BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, settings.config);
-        }
-
-
-        if(settings.nickname.nick){
-            BdApi.findModuleByProps("changeNickname").changeNickname(data.guild.id, null, "@me",  settings.nickname.nick);
+            if(settings.nickname.nick){
+                BdApi.findModuleByProps("changeNickname").changeNickname(data.guild.id, null, "@me",  settings.nickname.nick);
+            }
         }
     }
 
@@ -292,7 +303,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     return class ServerConfig extends Plugin {
 
         onStart() {
-            if(this.settings.has_seen_settings !== undefined) {
+            let HasSeenSettings = BdApi.Data.load(config.info.name, 'has_seen_settings');
+            if(HasSeenSettings == undefined || HasSeenSettings != true) {
                 BdApi.showToast(`${config.info.name} plugins is running, you have to change the plugin settings to make it do something`,
                     {
                         type:"success",
@@ -311,7 +323,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         getSettingsPanel() {
-            BdApi.setData(config.info.name, 'has_seen_settings', true);
+            BdApi.Data.save(config.info.name, 'has_seen_settings', true);
             const panel = this.buildSettingsPanel();
             return panel.getElement();
 		}
