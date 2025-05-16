@@ -1,7 +1,7 @@
 /**
  * @name ServerConfig
  * @description Apply a custom configuration when joining a new server
- * @version 1.1.0
+ * @version 1.1.1
  * @author Ekibunnel
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
@@ -20,12 +20,19 @@ const Config = {
             }
         ],
         authorLink: "https://github.com/Ekibunnel",
-        version: "1.1.0",
+        version: "1.1.1",
         description: "Apply a custom configuration when joining a new server",
         github: "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         github_raw: "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     changelog: [
+        {
+            title: "1.1.1",
+            type: "improved",
+            items: [
+                "Don't use deprecated BdApi functions anymore"
+            ]
+        },
         {
             title: "1.1.0",
             type: "fixed",
@@ -259,7 +266,7 @@ module.exports = meta => {
     }
 
     //main
-    let dirtyDispatch = BdApi.findModuleByProps("dispatch", "subscribe");
+    let dirtyDispatch = BdApi.Webpack.getModule(m => m.dispatch && m.subscribe);
     if (!dirtyDispatch) BdApi.Logger.error(Config.info.name, "Dispatch Module not found");
 
     let ApplyConfigTimeWindow = 60000; // in ms (fix 1.0.5)
@@ -270,11 +277,11 @@ module.exports = meta => {
         } else {
 
             if(Object.keys(CurrentSettings.config).length > 0){
-                BdApi.findModuleByProps("updateGuildNotificationSettings").updateGuildNotificationSettings(data.guild.id, CurrentSettings.config);
+                BdApi.Webpack.getModule(m => m.updateGuildNotificationSettings).updateGuildNotificationSettings(data.guild.id, CurrentSettings.config);
             }
 
             if(CurrentSettings.nickname.nick && CurrentSettings.nickname.nick.length > 0){
-                BdApi.findModuleByProps("changeNickname").changeNickname(data.guild.id, null, "@me",  CurrentSettings.nickname.nick);
+                BdApi.Webpack.getModule(m => m.changeNickname).changeNickname(data.guild.id, null, "@me",  CurrentSettings.nickname.nick);
             }
         }
     }
@@ -282,7 +289,7 @@ module.exports = meta => {
     function ON_GUILD_JOIGNED(data){
 
         if(CurrentSettings.experimental.terms){
-            BdApi.findModuleByProps("submitVerificationForm").submitVerificationForm(data.guildId, "@me");
+            BdApi.Webpack.getModule(m => m.submitVerificationForm).submitVerificationForm(data.guildId, "@me");
         }
     }
 
@@ -303,7 +310,7 @@ module.exports = meta => {
             }
             let HasSeenSettings = BdApi.Data.load(Config.info.name, 'has_seen_settings');
             if(HasSeenSettings == undefined || HasSeenSettings != true) {
-                BdApi.showToast(`${Config.info.name} plugins is running, you have to change the plugin settings to make it do something`,
+                BdApi.UI.showToast(`${Config.info.name} plugins is running, you have to change the plugin settings to make it do something`,
                     {
                         type:"success",
                         icon:true,
