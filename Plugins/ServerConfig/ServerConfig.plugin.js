@@ -1,7 +1,7 @@
 /**
  * @name ServerConfig
  * @description Apply a custom configuration when joining a new server
- * @version 1.1.1
+ * @version 1.1.2
  * @author Ekibunnel
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig
@@ -20,12 +20,19 @@ const Config = {
             }
         ],
         authorLink: "https://github.com/Ekibunnel",
-        version: "1.1.1",
+        version: "1.1.2",
         description: "Apply a custom configuration when joining a new server",
         github: "https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/ServerConfig",
         github_raw: "https://raw.githubusercontent.com/Ekibunnel/BetterDiscordAddons/main/Plugins/ServerConfig/ServerConfig.plugin.js"
     },
     changelog: [
+        {
+            title: "1.1.2",
+            type: "fixed",
+            items: [
+                "Fix Dispatch module not found again (again)"
+            ]
+        },
         {
             title: "1.1.1",
             type: "improved",
@@ -266,8 +273,8 @@ module.exports = meta => {
     }
 
     //main
-    let dirtyDispatch = BdApi.Webpack.getModule(m => m.dispatch && m.subscribe);
-    if (!dirtyDispatch) BdApi.Logger.error(Config.info.name, "Dispatch Module not found");
+    const DispatchModule = BdApi.Webpack.getByKeys("subscribe", "dispatch", {searchExports: true});
+    if (!DispatchModule) BdApi.Logger.error(Config.info.name, "Dispatch Module not found");
 
     let ApplyConfigTimeWindow = 60000; // in ms (fix 1.0.5)
 
@@ -318,12 +325,12 @@ module.exports = meta => {
                     }
                 );
             }
-            dirtyDispatch.subscribe("GUILD_CREATE", ON_GUILD_CREATED);
-            dirtyDispatch.subscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
+            DispatchModule.subscribe("GUILD_CREATE", ON_GUILD_CREATED);
+            DispatchModule.subscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
         },
         stop: () => {
-            dirtyDispatch.unsubscribe("GUILD_CREATE", ON_GUILD_CREATED);
-            dirtyDispatch.unsubscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
+            DispatchModule.unsubscribe("GUILD_CREATE", ON_GUILD_CREATED);
+            DispatchModule.unsubscribe("GUILD_JOIN_REQUEST_CREATE", ON_GUILD_JOIGNED);
             CurrentSettings = {};
         },
         getSettingsPanel() {
