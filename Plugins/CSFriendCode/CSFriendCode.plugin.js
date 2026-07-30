@@ -1,7 +1,7 @@
 /**
  * @name CSFriendCode
  * @description Parse CS Friend Codes from nicknames on discord servers and open them in the browser
- * @version 1.0.0
+ * @version 1.0.1
  * @author Ekibunnel
  * @authorLink https://github.com/Ekibunnel
  * @website https://github.com/Ekibunnel/BetterDiscordAddons/blob/main/Plugins/CSFriendCode
@@ -11,6 +11,13 @@
 
 const Config = {
     changelog: [
+        {
+            title: "1.0.1",
+            type: "fixed",
+            items: [
+                "Fix typo"
+            ]
+        },
         {
             title: "1.0.0",
             type: "improved",
@@ -178,7 +185,7 @@ module.exports = meta => {
     function ProcessCSFriendCode(GuildId, User){
         var StringToSearch = "";
 
-        var UserGlobalName = User.UserGlobalName;
+        var UserGlobalName = User?.globalName; //right..
         if (UserGlobalName != null) {
             StringToSearch = UserGlobalName;
         }
